@@ -39,7 +39,8 @@ type WEBP struct {
 		Header          ChunkHeader
 		BackgroundColor [4]byte // [Blue, Green, Red, Alpha] byte order
 		LoopCount       uint16
-		AnimationFrames []AnimationFrame
+		Frames          []AnimationFrame
+		LastPosition    uint32
 	}
 }
 

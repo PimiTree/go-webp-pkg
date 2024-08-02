@@ -64,7 +64,9 @@ func (webp *WEBP) getVP8ExtendedDimensions() {
 // getAnimationChunk takes Animation chunk header and its fields for "ANIM". Raw data slice [30:41]
 func (webp *WEBP) getAnimationChunk() {
 	webp.getANIM()
-	webp.getANMF()
+
+	webp.getANMF(44)
+
 }
 func (webp *WEBP) getANIM() {
 	webp.Animation.Header = chunkHeaderCreate(webp.Data[30:38])
@@ -77,22 +79,33 @@ func (webp *WEBP) getANIM() {
 	webp.Animation.LoopCount = binary.LittleEndian.Uint16(webp.Data[42:44]) // 0 == infinity
 }
 
-// getAnimationChunk takes Animation chunk header and its fields for "ANMF". Raw data [:]
-func (webp *WEBP) getANMF() {
-	reserved := webp.Data[67]
+// getAnimationChunk takes Animation chunk header and its fields for "ANMF". Raw data [44:68]
+func (webp *WEBP) getANMF(position uint32) {
+	reserved := webp.Data[position+22]
 
-	webp.Animation.AnimationFrames = append(webp.Animation.AnimationFrames, AnimationFrame{
-		Header:         chunkHeaderCreate(webp.Data[44:52]),
-		FrameX:         dataConverter.FromUint24TRoUint32(webp.Data[52:55]),     // The X coordinate of the upper left corner of the frame is Frame X * 2.
-		FrameY:         dataConverter.FromUint24TRoUint32(webp.Data[55:58]),     // The Y coordinate of the upper left corner of the frame is Frame Y * 2.
-		FrameWidth:     dataConverter.FromUint24TRoUint32(webp.Data[58:61]) + 1, // data holds as Frame Width Minus One
-		FrameHeight:    dataConverter.FromUint24TRoUint32(webp.Data[61:64]) + 1, // data holds as Frame Width Minus One
-		FrameDuration:  dataConverter.FromUint24TRoUint32(webp.Data[64:67]),
+	webp.Animation.Frames = append(webp.Animation.Frames, AnimationFrame{
+		Header:         chunkHeaderCreate(webp.Data[position : position+8]),
+		FrameX:         dataConverter.FromUint24TRoUint32(webp.Data[position+8 : position+11]),    // The X coordinate of the upper left corner of the frame is Frame X * 2.
+		FrameY:         dataConverter.FromUint24TRoUint32(webp.Data[position+11 : position+14]),   // The Y coordinate of the upper left corner of the frame is Frame Y * 2.
+		FrameWidth:     dataConverter.FromUint24TRoUint32(webp.Data[position+14:position+17]) + 1, // data holds as Frame Width Minus One
+		FrameHeight:    dataConverter.FromUint24TRoUint32(webp.Data[position+17:position+20]) + 1, // data holds as Frame Width Minus One
+		FrameDuration:  dataConverter.FromUint24TRoUint32(webp.Data[position+20 : position+23]),
 		Reserved:       reserved,
 		BlendingMethod: isBitwiseTrue(reserved, 0),
 		DisposalMethod: isBitwiseTrue(reserved, 1),
 		FrameData:      FrameData{},
 	})
+
+	nextPosition := position + 8 + webp.Animation.Frames[len(webp.Animation.Frames)-1].Header.ChunkSize
+	webp.Animation.LastPosition = nextPosition
+	if nextPosition >= webp.Header.FileSize.Value {
+		return
+	}
+
+	if string(webp.Data[nextPosition:nextPosition+4]) == "ANMF" {
+		webp.getANMF(nextPosition)
+	}
+
 }
 
 func isBitwiseTrue(b byte, s int) bool {

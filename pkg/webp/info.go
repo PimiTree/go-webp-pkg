@@ -7,7 +7,7 @@ func (webp *WEBP) Info() {
 	fmt.Printf("Path: %s \n Header: \n	%s \n	%d \n	%s \nVP8Chunk: \n	Header: %s \n	ChunkSize: %d \n",
 		webp.FilePath,
 		webp.Header.RIFFChunk.Value,
-		webp.Header.FileSize.Value,
+		webp.Header.FileSize.Value+4,
 		webp.Header.WEBPChunk.Value,
 		webp.VP8Chunk.Header.Value,
 		webp.VP8Chunk.Header.ChunkSize,
@@ -24,13 +24,14 @@ func (webp *WEBP) Info() {
 		)
 	}
 	if webp.VP8Chunk.Extended.Animation {
-		fmt.Printf("AnimationChunk: \n	Header: %s \n	ChunkSize: %d \n	BackgroundColor: %v \n 	LoopCount: %d \n",
+		fmt.Printf("AnimationChunk: \n	Header: %s \n	ChunkSize: %d \n	BackgroundColor: %v \n 	LoopCount: %d \n		LastPosition: %d \n",
 			webp.Animation.Header.Value,
 			webp.Animation.Header.ChunkSize,
 			webp.Animation.BackgroundColor,
 			webp.Animation.LoopCount,
+			webp.Animation.LastPosition,
 		)
-		for _, frame := range webp.Animation.AnimationFrames {
+		for _, frame := range webp.Animation.Frames {
 			fmt.Printf("	AnimationFrame: \n		Header: %s \n		ChunkSize: %d \n		FrameX: %d \n		FrameY: %d \n		FrameWidth: %d \n		FrameHeight:  %d \n		FrameDuration:   %d \n		BlendingMethod: %t \n		DisposalMethod: %t \n",
 				frame.Header.Value,
 				frame.Header.ChunkSize,
