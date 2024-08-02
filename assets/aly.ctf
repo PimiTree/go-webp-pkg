@@ -1,0 +1,32 @@
+Tests
+
+1. WebpLossyNoAlpha.webp
+Expected:
+    FileSize  82698 - 4(RIFF bytes) = 82694
+    VP8Header "VP8 "
+
+2. WebpLossyAlpha.webp
+Expected:
+    FileSize  58728 - 4(RIFF bytes) = 58724
+    VP8Header VP8X
+
+
+3. WebpLossLessAlpha.webp
+Expected:
+    FileSize 99434 - 4(RIFF bytes) = 99430
+    VP8Header VP8L
+
+
+4. WebpAnimatedNoAlpha.webp
+Expected:
+    FileSize  37342 - 4(RIFF bytes) = 37338
+    VP8Header VP8X
+    Animation true
+
+
+5. WebpAnimatedAlpha.webp
+Expected:
+    FileSize  367948 - 4(RIFF bytes) = 367944
+    VP8Header VP8X
+    Animation true
+
