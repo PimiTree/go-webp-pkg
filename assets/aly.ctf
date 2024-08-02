@@ -17,7 +17,7 @@ Expected:
     VP8Header VP8L
 
 
-4. WebpAnimatedNoAlpha.webp
+4. WebpAnimatedNoAlpha.webp  - this file has ILEXAR Alpha. Need found other file.
 Expected:
     FileSize  37342 - 4(RIFF bytes) = 37338
     VP8Header VP8X
